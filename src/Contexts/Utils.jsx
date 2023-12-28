@@ -5,7 +5,7 @@ const UtilsContext = createContext({});
 export const UtilsProvider = ({ children }) => {
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState(0); // 0 = error, 1 = warning, 2 = success
-    const [timer, setTimer] = useState(0);
+    const [timer, setTimer] = useState();
 
     function showNotification(message, alertType){
         clearTimeout(timer);
