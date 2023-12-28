@@ -92,6 +92,15 @@ export default function Dashboard(){
         navigate("/dashboard/edit/" + heroId);
     }
 
+    function createHero(){
+        if(api.public !== activeUser){
+            showNotification("Só podes adicionar herois teus!", 0);
+            return;
+        }
+
+        navigate("/dashboard/add");
+    }
+
     return (
         <div className="flex flex-col items-center flex-auto">
             <div className="flex mt-8 items-center justify-between w-[72rem]">
@@ -109,7 +118,8 @@ export default function Dashboard(){
                         </select>
                     </div> }
                 </div>
-                <button className={`bg-emerald-500 px-5 py-2 rounded text-white text-lg flex items-center space-x-2 hover:bg-emerald-600 ${activeUser !== api.public ? "cursor-not-allowed" : "cursor-pointer"}`} title={activeUser !== api.public ? "Não é possivel editar este utilizador, seleciona o teu!" : null} disabled={activeUser === api.public ? false : true} type="button" onClick={() => { navigate("/dashboard/add"); }}>
+                <button className="bg-emerald-500 px-5 py-2 rounded text-white text-lg flex items-center space-x-2 hover:bg-emerald-600" title="Adicionar Heroi" type="button" onClick={() => { createHero(); }}>
+                    {/* Codigo caso quisesse fazer o disable do btn: disabled={activeUser === api.public ? false : true} */}
                     <IoMdAdd className="w-6 h-6 text-white" />
                     <p>Adicionar Super Heroi</p>
                 </button>
