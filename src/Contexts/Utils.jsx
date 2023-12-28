@@ -1,50 +1,31 @@
 import React, { createContext, useContext, useState } from "react";
-import api from "../services/api";
 
 const UtilsContext = createContext({});
 
 export const UtilsProvider = ({ children }) => {
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState(0); // 0 = error, 1 = warning, 2 = success
+    const [timer, setTimer] = useState(0);
 
-    const [heroes, setHeroes] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [activeUser, setActiveUser] = useState(api.public);
-    const [favoriteHeroes, setFavoriteHeroes] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    async function loadHeroes(){
-        if(heroes.length === 0){
-            const heroesData = await api.api.get('/users/' + activeUser);
-            setHeroes(heroesData.data);
-            const favoritesData = await api.api.get('/users/' + activeUser + '/top');
-            setFavoriteHeroes(favoritesData.data);
-            const usersData = await api.api.get('/users/');
-            setUsers(usersData.data);
-            setIsLoading(false);
-        }        
+    function showNotification(message, alertType){
+        setMessage(message);
+        setMessageType(alertType);
+        setTimer(setTimeout(() => {
+            setMessage('');
+        }, 5000));
     }
 
-    async function updateSelectedUser(userSelected) {
-        setIsLoading(true);
-        setActiveUser(userSelected);
-        const heroesData = await api.api.get('/users/' + userSelected);
-        setHeroes(heroesData.data);
-        const favoritesData = await api.api.get('/users/' + userSelected + '/top');
-        setFavoriteHeroes(favoritesData.data);
-        setIsLoading(false);
+    function closeNotification(){
+        clearTimeout(timer);
+        setMessage('');
     }
 
     return (
         <UtilsContext.Provider value={{
-            heroes,
-            setHeroes,
-            favoriteHeroes,
-            setFavoriteHeroes,
-            loadHeroes,
-            isLoading,
-            users,
-            updateSelectedUser,
-            activeUser,
-            setActiveUser
+            message,
+            showNotification,
+            closeNotification,
+            messageType
         }}>
             { children }
         </UtilsContext.Provider>

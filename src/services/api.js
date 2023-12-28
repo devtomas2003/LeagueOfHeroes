@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default {
-    api: axios.create({
+    request: axios.create({
         baseURL: 'https://psw-server.onrender.com',
         timeout: 5000
     }),

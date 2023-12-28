@@ -3,10 +3,10 @@ import { MdDelete } from "react-icons/md";
 import { FaPencil } from "react-icons/fa6";
 import { Fragment, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUtils } from "../Contexts/Utils";
+import { useApi } from "../Contexts/Api";
 import SkeletonTable from "../Components/SkeletonTable";
 import api from "../services/api";
-import axios from "axios";
+import { useUtils } from "../Contexts/Utils";
 
 export default function Dashboard(){
     const navigate = useNavigate();
@@ -21,43 +21,75 @@ export default function Dashboard(){
         users,
         updateSelectedUser,
         activeUser
-    } = useUtils();
+    } = useApi();
+
+    const { showNotification } = useUtils();
 
     useEffect(() => {
         loadHeroes();
     }, []);
 
     async function removeHero(heroId){
+        if(api.public !== activeUser){
+            showNotification("Só podes remover herois teus!", 0);
+            return;
+        }
+
         const posHero = heroes.findIndex(object => {
             return object.id === heroId;
         });
         if(confirm("Deseja realmente apagar " + heroes[posHero].name + "?")){
+            await api.request.post('/users/' + api.secret + "/top", favoriteHeroes.filter(item => item !== heroId));
             setFavoriteHeroes(favoriteHeroes.filter(item => item !== heroId));
-            await api.api.post('/users/' + api.secret, heroes.filter(item => item.id !== heroId));
+            await api.request.post('/users/' + api.secret, heroes.filter(item => item.id !== heroId));
             setHeroes(heroes.filter(item => item.id !== heroId));
         }
     }
 
     async function addFav(heroId){
+        if(api.public !== activeUser){
+            showNotification("Só podes adicionar herois teus nos favoritos!", 0);
+            return;
+        }
+
+        if(favoriteHeroes.length >= 3){
+            showNotification("Só podes ter 3 herois nos favoritos!", 1);
+            return;
+        }
+
         const posHero = heroes.findIndex(object => {
             return object.id === heroId;
         });
 
         if(confirm("Deseja realmente adicionar " + heroes[posHero].name + " aos seus favoritos?")){
             setFavoriteHeroes(prevArray => [...prevArray, heroId]);
-            await api.api.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
+            await api.request.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
         }
     }
 
     async function deleteFav(heroId){
+        if(api.public !== activeUser){
+            showNotification("Só podes remover herois teus nos favoritos!", 0);
+            return;
+        }
+
         const posHero = heroes.findIndex(object => {
             return object.id === heroId;
         });
 
         if(confirm("Deseja realmente remover " + heroes[posHero].name + " aos seus favoritos?")){
             setFavoriteHeroes(favoriteHeroes.filter(item => item !== heroId));
-            await api.api.post('/users/' + api.secret + '/top', favoriteHeroes.filter(item => item !== heroId));
+            await api.request.post('/users/' + api.secret + '/top', favoriteHeroes.filter(item => item !== heroId));
         }
+    }
+
+    function editHero(heroId){
+        if(api.public !== activeUser){
+            showNotification("Só podes editar herois teus!", 0);
+            return;
+        }
+
+        navigate("/dashboard/edit/" + heroId);
     }
 
     return (
@@ -113,22 +145,26 @@ export default function Dashboard(){
                                 <td className="border p-2 text-center">{hero.super_power ? hero.super_power : "N/D"}</td>
                                 <td className="border p-2">
                                     <div className="flex justify-center space-x-2">
-                                        <button className={`bg-red-500 px-4 py-2 rounded text-white text-lg hover:bg-red-600 flex items-center space-x-2 ${activeUser !== api.public ? "cursor-not-allowed" : "hover:bg-emerald-600"}`} title={activeUser !== api.public ? "Não é possivel editar este utilizador, seleciona o teu!" : null} disabled={activeUser === api.public ? false : true} type="button" onClick={() => { removeHero(hero.id) }}>
+                                        <button className="bg-red-500 px-4 py-2 rounded text-white text-lg hover:bg-red-600 flex items-center space-x-2" title="Apagar Heroi" type="button" onClick={() => { removeHero(hero.id) }}>
+                                            {/* Codigo caso quisesse fazer o disable do btn: disabled={activeUser === api.public ? false : true} */}
                                             <MdDelete className="w-6 h-6 text-white" />
                                             <p>Apagar</p>
                                         </button>
                                         { favoriteHeroes.includes(hero.id) ?
-                                        <button className={`bg-red-500 px-4 py-2 rounded text-white text-lg hover:bg-red-600 flex items-center space-x-2 ${activeUser !== api.public ? "cursor-not-allowed" : "hover:bg-emerald-600"}`} title={activeUser !== api.public ? "Não é possivel editar este utilizador, seleciona o teu!" : null} disabled={activeUser === api.public ? false : true} type="submit" onClick={() => { deleteFav(hero.id); }}>
+                                        <button className="bg-red-500 px-4 py-2 rounded text-white text-lg hover:bg-red-600 flex items-center space-x-2" title="Remove Favorito" type="submit" onClick={() => { deleteFav(hero.id); }}>
+                                            {/* disabled={activeUser === api.public ? false : true} */}
                                             <IoMdRemove className="w-6 h-6 text-white" />
                                             <p>Remover Favorito</p>
                                         </button>
                                         :
-                                        <button className={`bg-emerald-500 px-4 py-2 rounded text-white text-lg flex items-center space-x-2 ${favoriteHeroes.length >= 3 || activeUser !== api.public ? "cursor-not-allowed" : "hover:bg-emerald-600"}`} title={activeUser !== api.public ? "Não é possivel editar este utilizador, seleciona o teu!" : (favoriteHeroes.length === 3 ? "Já tens 3 herois nos favoritos!" : null)} disabled={favoriteHeroes.length >= 3 || activeUser !== api.public ? true : false} type="submit" onClick={() => { addFav(hero.id); }}>
+                                        <button className="bg-emerald-500 px-4 py-2 rounded text-white text-lg flex items-center space-x-2" title="Adicionar Favorito" type="submit" onClick={() => { addFav(hero.id); }}>
+                                            {/* Codigo caso quisesse fazer o disable do btn: disabled={favoriteHeroes.length >= 3 || activeUser !== api.public ? true : false} */}
                                             <IoMdAdd className="w-6 h-6 text-white" />
                                             <p>Marcar Favorito</p>
                                         </button>
                                         }
-                                        <button className={`bg-yellow-400 px-4 py-2 rounded text-white text-lg hover:bg-yellow-500 flex items-center space-x-2 ${activeUser !== api.public ? "cursor-not-allowed" : "hover:bg-emerald-600"}`} title={activeUser !== api.public ? "Não é possivel editar este utilizador, seleciona o teu!" : null} disabled={activeUser === api.public ? false : true} onClick={() => { navigate("/dashboard/edit/" + hero.id); }}>
+                                        <button className="bg-yellow-400 px-4 py-2 rounded text-white text-lg hover:bg-yellow-500 flex items-center space-x-2" title="Editar Heroi" onClick={() => { editHero(hero.id); }}>
+                                            {/* Codigo caso quisesse fazer o disable do btn: disabled={activeUser === api.public ? false : true} */}
                                             <FaPencil className="w-6 h-6 text-white" />
                                             <p>Editar</p>
                                         </button>

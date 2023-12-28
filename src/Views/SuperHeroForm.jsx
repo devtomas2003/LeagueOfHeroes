@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import api from "../services/api";
-import { useUtils } from "../Contexts/Utils";
+import { useApi } from "../Contexts/Api";
 import { Fragment, useEffect } from "react";
+import { useUtils } from "../Contexts/Utils";
 
 const submitHeroFormSchema = z.object({
     name: z.string().min(3, 'O nome têm de ter no minimo 3 caracteres!'),
@@ -15,7 +16,9 @@ const submitHeroFormSchema = z.object({
 });
 
 export default function SuperHeroForm(){
-    const { loadHeroes, heroes, isLoading, setHeroes, setActiveUser, activeUser } = useUtils();
+    const { loadHeroes, heroes, isLoading, setHeroes, setActiveUser, activeUser } = useApi();
+    const { showNotification } = useUtils();
+
     const navigate = useNavigate();
     const { id } = useParams();
     
@@ -25,9 +28,6 @@ export default function SuperHeroForm(){
     });
 
     useEffect(() => {
-        if(activeUser !== api.public){
-            setActiveUser(api.public);
-        }
         loadHeroes();
     }, []);
 
@@ -49,9 +49,10 @@ export default function SuperHeroForm(){
                 super_power: formData.super_power,
                 id: parseInt(id)
             }; return listOfHeroes; });
-            await api.api.post('/users/' + api.secret, heroes);
+            await api.request.post('/users/' + api.secret, heroes);
+            showNotification('Heroi atualizado com sucesso!', 2);
         }else{
-            await api.api.post('/users/' + api.secret, [...heroes, {
+            await api.request.post('/users/' + api.secret, [...heroes, {
                 name: formData.name,
                 image: formData.image,
                 super_power: formData.super_power,
@@ -63,6 +64,7 @@ export default function SuperHeroForm(){
                 super_power: formData.super_power,
                 id: heroes.length
             }]);
+            showNotification('Heroi criado com sucesso!', 2);
         }
 
         navigate('/dashboard');

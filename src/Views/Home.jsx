@@ -2,17 +2,17 @@ import { Fragment, useEffect } from "react";
 import HeroInfo from "../Components/HeroInfo";
 import Skeleton from "../Components/Skeleton";
 import { Link } from "react-router-dom";
-import { useUtils } from "../Contexts/Utils";
+import { useApi } from "../Contexts/Api";
 
 export default function Home(){
-    const { loadHeroes, heroes, favoriteHeroes, isLoading } = useUtils();
+    const { loadHeroes, heroes, favoriteHeroes, isLoading } = useApi();
 
     useEffect(() => {
         loadHeroes();
     }, []);
 
     function findHeroById(heroId) {
-        return heroes.find((hero) => { return (hero.id === heroId); })
+        return heroes.find((hero) => { return (hero.id === heroId); });
     }
 
     return (
