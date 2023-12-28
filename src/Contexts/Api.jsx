@@ -30,11 +30,15 @@ export const ApiProvider = ({ children }) => {
         if(heroesData.data){
             const heroesResult = heroesData.data.map((hero) => { hero.id = parseInt(hero.id); return hero; });
             setHeroes(heroesResult);
+        }else{
+            setHeroes([]);
         }
         const favoritesData = await api.request.get('/users/' + userSelected + '/top');
         if(favoritesData.data){
             const favsResult = favoritesData.data.map((hero) => { hero = parseInt(hero); return hero; });
             setFavoriteHeroes(favsResult);
+        }else{
+            setFavoriteHeroes([]);
         }
         setIsLoading(false);
     }
