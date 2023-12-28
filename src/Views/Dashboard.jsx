@@ -167,7 +167,7 @@ export default function Dashboard(){
                                             <p>Remover Favorito</p>
                                         </button>
                                         :
-                                        <button className="bg-emerald-500 px-4 py-2 rounded text-white text-lg flex items-center space-x-2" title="Adicionar Favorito" type="submit" onClick={() => { addFav(hero.id); }}>
+                                        <button className="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded text-white text-lg flex items-center space-x-2" title="Adicionar Favorito" type="submit" onClick={() => { addFav(hero.id); }}>
                                             {/* Codigo caso quisesse fazer o disable do btn: disabled={favoriteHeroes.length >= 3 || activeUser !== api.public ? true : false} */}
                                             <IoMdAdd className="w-6 h-6 text-white" />
                                             <p>Marcar Favorito</p>
