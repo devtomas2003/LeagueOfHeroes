@@ -8,6 +8,7 @@ export const UtilsProvider = ({ children }) => {
     const [timer, setTimer] = useState(0);
 
     function showNotification(message, alertType){
+        clearTimeout(timer);
         setMessage(message);
         setMessageType(alertType);
         setTimer(setTimeout(() => {
