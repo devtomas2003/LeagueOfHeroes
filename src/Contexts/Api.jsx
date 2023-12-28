@@ -14,11 +14,9 @@ export const ApiProvider = ({ children }) => {
     async function loadHeroes(){
         if(heroes.length === 0){
             const heroesData = await api.request.get('/users/' + activeUser);
-            const heroesResult = heroesData.data.map((hero) => { hero.id = parseInt(hero.id); return hero; });
-            setHeroes(heroesResult);
+            setHeroes(heroesData.data);
             const favoritesData = await api.request.get('/users/' + activeUser + '/top');
-            const favsResult = favoritesData.data.map((hero) => { hero = parseInt(hero); return hero; });
-            setFavoriteHeroes(favsResult);
+            setFavoriteHeroes(favoritesData.data);
             const usersData = await api.request.get('/users');
             setUsers(usersData.data);
             setIsLoading(false);
@@ -29,11 +27,15 @@ export const ApiProvider = ({ children }) => {
         setIsLoading(true);
         setActiveUser(userSelected);
         const heroesData = await api.request.get('/users/' + userSelected);
-        const heroesResult = heroesData.data.map((hero) => { hero.id = parseInt(hero.id); return hero; });
-        setHeroes(heroesResult);
+        if(heroesData.data){
+            const heroesResult = heroesData.data.map((hero) => { hero.id = parseInt(hero.id); return hero; });
+            setHeroes(heroesResult);
+        }
         const favoritesData = await api.request.get('/users/' + userSelected + '/top');
-        const favsResult = favoritesData.data.map((hero) => { hero = parseInt(hero); return hero; });
-        setFavoriteHeroes(favsResult);
+        if(favoritesData.data){
+            const favsResult = favoritesData.data.map((hero) => { hero = parseInt(hero); return hero; });
+            setFavoriteHeroes(favsResult);
+        }
         setIsLoading(false);
     }
 
