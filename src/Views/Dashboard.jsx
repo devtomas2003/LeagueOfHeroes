@@ -43,6 +43,7 @@ export default function Dashboard(){
             setFavoriteHeroes(favoriteHeroes.filter(item => item !== heroId));
             await api.request.post('/users/' + api.secret, heroes.filter(item => item.id !== heroId));
             setHeroes(heroes.filter(item => item.id !== heroId));
+            showNotification("Heroi apagado com sucesso!", 2);
         }
     }
 
@@ -64,6 +65,7 @@ export default function Dashboard(){
         if(confirm("Deseja realmente adicionar " + heroes[posHero].name + " aos seus favoritos?")){
             setFavoriteHeroes(prevArray => [...prevArray, heroId]);
             await api.request.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
+            showNotification("Heroi adicionado com sucesso aos favoritos!", 2);
         }
     }
 
@@ -80,6 +82,7 @@ export default function Dashboard(){
         if(confirm("Deseja realmente remover " + heroes[posHero].name + " aos seus favoritos?")){
             setFavoriteHeroes(favoriteHeroes.filter(item => item !== heroId));
             await api.request.post('/users/' + api.secret + '/top', favoriteHeroes.filter(item => item !== heroId));
+            showNotification("Heroi removido com sucesso dos favoritos!", 2);
         }
     }
 
