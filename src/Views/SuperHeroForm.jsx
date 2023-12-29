@@ -62,7 +62,7 @@ export default function SuperHeroForm(){
                 name: formData.name,
                 image: formData.image,
                 super_power: formData.super_power,
-                id: heroes[heroes.length-1].id+1
+                id: heroes.length === 0 ? 0 : heroes[heroes.length-1].id+1
             }]);
             showNotification('Heroi criado com sucesso!', 2);
         }

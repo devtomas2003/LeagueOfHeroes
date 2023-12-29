@@ -116,7 +116,7 @@ export default function Dashboard(){
                         <label>Utilizador: </label>
                         <select onChange={(e) => { updateSelectedUser(e.target.value); }} defaultValue={activeUser} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-none focus:ring-blue-500 focus:border-blue-500 w-52 p-1 ml-2">
                             { users.map((user) => {
-                                return (<option key={user}>{user}</option>);
+                                return (<option key={user} value={user}>{user === parseInt(api.public) ? api.public + " (Owner)" : user}</option>);
                             }) }
                         </select>
                     </div> }
