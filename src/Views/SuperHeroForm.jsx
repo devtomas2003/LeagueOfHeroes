@@ -43,7 +43,7 @@ export default function SuperHeroForm(){
         reset();
 
         if(id){
-            setHeroes((listOfHeroes) => { listOfHeroes[id] = {
+            setHeroes((listOfHeroes) => { listOfHeroes[listOfHeroes.findIndex((listOfAllHeroes) => { return(listOfAllHeroes.id === parseInt(id)) })] = {
                 name: formData.name,
                 image: formData.image,
                 super_power: formData.super_power,
@@ -56,13 +56,13 @@ export default function SuperHeroForm(){
                 name: formData.name,
                 image: formData.image,
                 super_power: formData.super_power,
-                id: heroes.length
+                id: heroes[heroes.length-1].id+1
             }]);
             setHeroes(lastHeroes => [...lastHeroes, {
                 name: formData.name,
                 image: formData.image,
                 super_power: formData.super_power,
-                id: heroes.length
+                id: heroes[heroes.length-1].id+1
             }]);
             showNotification('Heroi criado com sucesso!', 2);
         }
