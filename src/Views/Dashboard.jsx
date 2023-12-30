@@ -20,7 +20,8 @@ export default function Dashboard(){
         setHeroes,
         users,
         updateSelectedUser,
-        activeUser
+        activeUser,
+        setIsLoading
     } = useApi();
 
     const { showNotification } = useUtils();
@@ -38,12 +39,18 @@ export default function Dashboard(){
         const posHero = heroes.findIndex(object => {
             return object.id === heroId;
         });
+
         if(confirm("Deseja realmente apagar " + heroes[posHero].name + "?")){
-            await api.request.post('/users/' + api.secret + "/top", favoriteHeroes.filter(item => item !== heroId));
-            setFavoriteHeroes(favoriteHeroes.filter(item => item !== heroId));
-            await api.request.post('/users/' + api.secret, heroes.filter(item => item.id !== heroId));
-            setHeroes(heroes.filter(item => item.id !== heroId));
+            setIsLoading(true);
+            const filterdFavs = favoriteHeroes.filter(item => item !== heroId);
+            await api.request.post('/users/' + api.secret + "/top", filterdFavs);
+            setFavoriteHeroes(filterdFavs);
+
+            const filteredHeroes = heroes.filter(item => item.id !== heroId);
+            await api.request.post('/users/' + api.secret, filteredHeroes);
+            setHeroes(filteredHeroes);
             showNotification("Heroi apagado com sucesso!", 2);
+            setIsLoading(false);
         }
     }
 
@@ -63,9 +70,11 @@ export default function Dashboard(){
         });
 
         if(confirm("Deseja realmente adicionar " + heroes[posHero].name + " aos seus favoritos?")){
+            setIsLoading(true);
             setFavoriteHeroes(prevArray => [...prevArray, heroId]);
             await api.request.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
             showNotification("Heroi adicionado com sucesso aos favoritos!", 2);
+            setIsLoading(false);
         }
     }
 
@@ -80,9 +89,12 @@ export default function Dashboard(){
         });
 
         if(confirm("Deseja realmente remover " + heroes[posHero].name + " aos seus favoritos?")){
-            setFavoriteHeroes(favoriteHeroes.filter(item => item !== heroId));
-            await api.request.post('/users/' + api.secret + '/top', favoriteHeroes.filter(item => item !== heroId));
+            setIsLoading(true);
+            const listDeleted = favoriteHeroes.filter(item => item !== heroId);
+            setFavoriteHeroes(listDeleted);
+            await api.request.post('/users/' + api.secret + '/top', listDeleted);
             showNotification("Heroi removido com sucesso dos favoritos!", 2);
+            setIsLoading(false);
         }
     }
 

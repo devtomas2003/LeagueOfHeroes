@@ -54,7 +54,8 @@ export const ApiProvider = ({ children }) => {
             users,
             updateSelectedUser,
             activeUser,
-            setActiveUser
+            setActiveUser,
+            setIsLoading
         }}>
             { children }
         </ApiContext.Provider>

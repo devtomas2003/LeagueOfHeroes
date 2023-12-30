@@ -16,7 +16,7 @@ const submitHeroFormSchema = z.object({
 });
 
 export default function SuperHeroForm(){
-    const { loadHeroes, heroes, isLoading, setHeroes, setActiveUser, activeUser } = useApi();
+    const { loadHeroes, heroes, isLoading, setHeroes, setIsLoading } = useApi();
     const { showNotification } = useUtils();
 
     const navigate = useNavigate();
@@ -33,40 +33,31 @@ export default function SuperHeroForm(){
 
     useEffect(() => {
         if(heroes[id]){
-            setValue('name', heroes[id].name);
-            setValue('image', heroes[id].image);
-            setValue('super_power', heroes[id].super_power);
+            const listOfProps = Object.keys(heroes[id]);
+            const heroData = heroes[id];
+            listOfProps.splice(listOfProps.indexOf('id'), 1);
+            listOfProps.forEach((propToPut) => {
+                setValue(propToPut, heroData[propToPut]);
+            });
         }
     }, [heroes]);
 
     async function submitLogin(formData){
         reset();
-
+        setIsLoading(true);
         if(id){
-            setHeroes((listOfHeroes) => { listOfHeroes[listOfHeroes.findIndex((listOfAllHeroes) => { return(listOfAllHeroes.id === parseInt(id)) })] = {
-                name: formData.name,
-                image: formData.image,
-                super_power: formData.super_power,
-                id: parseInt(id)
-            }; return listOfHeroes; });
+            const heroIdToEdit = heroes.findIndex((listOfAllHeroes) => { return(listOfAllHeroes.id === parseInt(id)) });
+            formData.id = parseInt(id); 
+            setHeroes((listOfHeroes) => { listOfHeroes[heroIdToEdit] = formData; return listOfHeroes; });
             await api.request.post('/users/' + api.secret, heroes);
             showNotification('Heroi atualizado com sucesso!', 2);
         }else{
-            await api.request.post('/users/' + api.secret, [...heroes, {
-                name: formData.name,
-                image: formData.image,
-                super_power: formData.super_power,
-                id: heroes[heroes.length-1].id+1
-            }]);
-            setHeroes(lastHeroes => [...lastHeroes, {
-                name: formData.name,
-                image: formData.image,
-                super_power: formData.super_power,
-                id: heroes.length === 0 ? 0 : heroes[heroes.length-1].id+1
-            }]);
+            formData.id = heroes.length === 0 ? 0 : heroes[heroes.length-1].id+1;
+            setHeroes(lastHeroes => [...lastHeroes, formData]);
+            await api.request.post('/users/' + api.secret, [...heroes, formData]);
             showNotification('Heroi criado com sucesso!', 2);
         }
-
+        setIsLoading(false);
         navigate('/dashboard');
     }
 
