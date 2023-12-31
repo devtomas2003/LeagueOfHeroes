@@ -32,7 +32,8 @@ export default function SuperHeroForm(){
     }, []);
 
     useEffect(() => {
-        if(heroes[id]){
+        const heroIdToEdit = heroes.findIndex((listOfAllHeroes) => { return(listOfAllHeroes.id === parseInt(id)) });
+        if(heroIdToEdit !== -1){
             const listOfProps = Object.keys(heroes[id]);
             const heroData = heroes[id];
             listOfProps.splice(listOfProps.indexOf('id'), 1);
@@ -48,17 +49,27 @@ export default function SuperHeroForm(){
         if(id){
             const heroIdToEdit = heroes.findIndex((listOfAllHeroes) => { return(listOfAllHeroes.id === parseInt(id)) });
             formData.id = parseInt(id); 
-            setHeroes((listOfHeroes) => { listOfHeroes[heroIdToEdit] = formData; return listOfHeroes; });
-            await api.request.post('/users/' + api.secret, heroes);
-            showNotification('Heroi atualizado com sucesso!', 2);
+            try{
+                heroes[heroIdToEdit] = formData;
+                await api.request.post('/users/' + api.secret, heroes);
+                setHeroes(heroes);
+                showNotification('Heroi atualizado com sucesso!', 2);
+                navigate('/dashboard');
+            }catch(e){
+                navigate('/api-error');
+            }
         }else{
             formData.id = heroes.length === 0 ? 0 : heroes[heroes.length-1].id+1;
-            setHeroes(lastHeroes => [...lastHeroes, formData]);
-            await api.request.post('/users/' + api.secret, [...heroes, formData]);
-            showNotification('Heroi criado com sucesso!', 2);
+            try{
+                await api.request.post('/users/' + api.secret, [...heroes, formData]);
+                setHeroes(lastHeroes => [...lastHeroes, formData]);
+                showNotification('Heroi criado com sucesso!', 2);
+                navigate('/dashboard'); 
+            }catch(e){
+                navigate('/api-error');
+            }
         }
         setIsLoading(false);
-        navigate('/dashboard');
     }
 
     return (

@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Views/Home";
 import Dashboard from "./Views/Dashboard";
 import SuperHeroForm from "./Views/SuperHeroForm";
+import APIError from "./Views/APIError";
+import NotFound from "./Views/NotFound";
 
 import Base from "./Components/Base";
 import Header from "./Components/Header";
@@ -25,6 +27,8 @@ export default function Router(){
                                 <Route path="/dashboard" element={<Dashboard />} />
                                 <Route path="/dashboard/add" element={<SuperHeroForm />} />
                                 <Route path="/dashboard/edit/:id" element={<SuperHeroForm />} />
+                                <Route path="/api-error" element={<APIError />} />
+                                <Route path="*" element={<NotFound />} />
                             </Routes>
                         </ApiProvider>
                     <Footer />

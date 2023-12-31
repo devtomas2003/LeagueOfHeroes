@@ -43,13 +43,20 @@ export default function Dashboard(){
         if(confirm("Deseja realmente apagar " + heroes[posHero].name + "?")){
             setIsLoading(true);
             const filterdFavs = favoriteHeroes.filter(item => item !== heroId);
-            await api.request.post('/users/' + api.secret + "/top", filterdFavs);
-            setFavoriteHeroes(filterdFavs);
-
+            try{
+                await api.request.post('/users/' + api.secret + "/top", filterdFavs);
+                setFavoriteHeroes(filterdFavs);
+            }catch(e){
+                navigate('/api-error');
+            }
             const filteredHeroes = heroes.filter(item => item.id !== heroId);
-            await api.request.post('/users/' + api.secret, filteredHeroes);
-            setHeroes(filteredHeroes);
-            showNotification("Heroi apagado com sucesso!", 2);
+            try{
+                await api.request.post('/users/' + api.secret, filteredHeroes);
+                setHeroes(filteredHeroes);
+                showNotification("Heroi apagado com sucesso!", 2);
+            }catch(e){
+                navigate('/api-error');
+            }
             setIsLoading(false);
         }
     }
@@ -71,9 +78,13 @@ export default function Dashboard(){
 
         if(confirm("Deseja realmente adicionar " + heroes[posHero].name + " aos seus favoritos?")){
             setIsLoading(true);
-            setFavoriteHeroes(prevArray => [...prevArray, heroId]);
-            await api.request.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
-            showNotification("Heroi adicionado com sucesso aos favoritos!", 2);
+            try{
+                setFavoriteHeroes(prevArray => [...prevArray, heroId]);
+                await api.request.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
+                showNotification("Heroi adicionado com sucesso aos favoritos!", 2);
+            }catch(e){
+                navigate('/api-error');
+            }
             setIsLoading(false);
         }
     }
@@ -91,9 +102,13 @@ export default function Dashboard(){
         if(confirm("Deseja realmente remover " + heroes[posHero].name + " aos seus favoritos?")){
             setIsLoading(true);
             const listDeleted = favoriteHeroes.filter(item => item !== heroId);
-            setFavoriteHeroes(listDeleted);
-            await api.request.post('/users/' + api.secret + '/top', listDeleted);
-            showNotification("Heroi removido com sucesso dos favoritos!", 2);
+            try{
+                await api.request.post('/users/' + api.secret + '/top', listDeleted);
+                setFavoriteHeroes(listDeleted);
+                showNotification("Heroi removido com sucesso dos favoritos!", 2);
+            }catch(e){
+                navigate('/api-error');
+            }
             setIsLoading(false);
         }
     }
