@@ -79,8 +79,8 @@ export default function Dashboard(){
         if(confirm("Deseja realmente adicionar " + heroes[posHero].name + " aos seus favoritos?")){
             setIsLoading(true);
             try{
-                setFavoriteHeroes(prevArray => [...prevArray, heroId]);
                 await api.request.post('/users/' + api.secret + '/top', [...favoriteHeroes, heroId]);
+                setFavoriteHeroes(prevArray => [...prevArray, heroId]);
                 showNotification("Heroi adicionado com sucesso aos favoritos!", 2);
             }catch(e){
                 navigate('/api-error');

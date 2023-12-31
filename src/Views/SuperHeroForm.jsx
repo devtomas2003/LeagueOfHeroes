@@ -50,9 +50,10 @@ export default function SuperHeroForm(){
             const heroIdToEdit = heroes.findIndex((listOfAllHeroes) => { return(listOfAllHeroes.id === parseInt(id)) });
             formData.id = parseInt(id); 
             try{
-                heroes[heroIdToEdit] = formData;
-                await api.request.post('/users/' + api.secret, heroes);
-                setHeroes(heroes);
+                const localUpdate = [...heroes];
+                localUpdate[heroIdToEdit] = formData;
+                await api.request.post('/users/' + api.secret, localUpdate);
+                setHeroes(localUpdate);
                 showNotification('Heroi atualizado com sucesso!', 2);
                 navigate('/dashboard');
             }catch(e){
